@@ -24,10 +24,13 @@ program read_diag
    real, allocatable :: iuse(:)
    real, allocatable :: robs1(:)
    real, allocatable :: ddiff(:)
+   real, allocatable :: robs2(:)
+   real, allocatable :: rdpt2(:)
    integer, allocatable :: iuse_int(:)
 
-   diagfile = '/scratch1/BMC/wrfruc/ejames/diag_conv_t_ges.2022111813.nc4'
+   CALL GETARG(1, diagfile)
    outfile = '/scratch1/BMC/wrfruc/ejames/diag_test.txt'
+
    call diag%open(trim(diagfile),'r',200)
    call diag%get_dim("nobs",nobs)
    write(*,*) 'nobs:', nobs
@@ -42,6 +45,8 @@ program read_diag
    allocate(iuse(nobs))
    allocate(robs1(nobs))
    allocate(ddiff(nobs))
+   allocate(robs2(nobs))
+   allocate(rdpt2(nobs))
    allocate(iuse_int(nobs))
 
    call diag%get_var_nc_char_2d("Observation_Class",7,nobs,var)
@@ -52,8 +57,15 @@ program read_diag
    call diag%get_var_nc_real_1d("Longitude",nobs,rlon)
    call diag%get_var_nc_real_1d("Pressure",nobs,rprs)
    call diag%get_var_nc_real_1d("Analysis_Use_Flag",nobs,iuse)
-   call diag%get_var_nc_real_1d("Observation",nobs,robs1)
-   call diag%get_var_nc_real_1d("Obs_Minus_Forecast_adjusted",nobs,ddiff)
+   if (diagfile(39:40) .eq. 'uv') then
+      call diag%get_var_nc_real_1d("u_Observation",nobs,robs1)
+      call diag%get_var_nc_real_1d("u_Obs_Minus_Forecast_adjusted",nobs,ddiff)
+      call diag%get_var_nc_real_1d("v_Observation",nobs,robs2)
+      call diag%get_var_nc_real_1d("v_Obs_Minus_Forecast_adjusted",nobs,rdpt2)
+   else
+      call diag%get_var_nc_real_1d("Observation",nobs,robs1)
+      call diag%get_var_nc_real_1d("Obs_Minus_Forecast_adjusted",nobs,ddiff)
+   endif
 
    open(42, file=trim(outfile))
 
@@ -61,9 +73,20 @@ program read_diag
 
       iuse_int(i) = int(iuse(i))   
 
-      write (42,'(A3," @ ",A8," : ",I3,F6.2,F8.2,F8.2,F8.2,I3,2F8.2)') &
+      if (diagfile(39:40) .eq. 'uv') then
+
+         write (42,'(A3," @ ",A8," : ",I3,F6.2,F8.2,F8.2,F8.2,I3,4F8.2)') &
+                   var(5,i)//var(6,i)//var(7,i),stationID(1,i)//stationID(2,i)//stationID(3,i)//stationID(4,i)//stationID(5,i)//stationID(6,i)//stationID(7,i)//stationID(8,i),itype(i),rdhr(i),rlat(i),rlon(i),rprs(i),iuse_int(i),robs1(i),ddiff(i),robs2(i),rdpt2(i) 
+
+      else
+
+         write (42,'(A3," @ ",A8," : ",I3,F6.2,F8.2,F8.2,F8.2,I3,2F8.2)') &
                    var(5,i)//var(6,i)//var(7,i),stationID(1,i)//stationID(2,i)//stationID(3,i)//stationID(4,i)//stationID(5,i)//stationID(6,i)//stationID(7,i)//stationID(8,i),itype(i),rdhr(i),rlat(i),rlon(i),rprs(i),iuse_int(i),robs1(i),ddiff(i)
 
+      endif
+
    enddo
+
+   print *, diagfile(39:40)
 
 end program read_diag
