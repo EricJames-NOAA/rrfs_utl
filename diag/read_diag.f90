@@ -63,7 +63,7 @@ program read_diag
    call diag%get_var_nc_real_1d("Longitude",nobs,rlon)
    call diag%get_var_nc_real_1d("Pressure",nobs,rprs)
    call diag%get_var_nc_real_1d("Analysis_Use_Flag",nobs,iuse)
-   if (diagfile(39:40) .eq. 'uv') then
+   if (diagfile(90:91) .eq. 'uv') then
       call diag%get_var_nc_real_1d("u_Observation",nobs,robs1)
       call diag%get_var_nc_real_1d("u_Obs_Minus_Forecast_adjusted",nobs,ddiff)
       call diag%get_var_nc_real_1d("v_Observation",nobs,robs2)
@@ -79,7 +79,7 @@ program read_diag
 
       iuse_int(i) = int(iuse(i))   
 
-      if (diagfile(39:40) .eq. 'uv') then
+      if (diagfile(90:91) .eq. 'uv') then
 
          write (42,'(A3," @ ",A8," : ",I3,F6.2,F8.2,F8.2,F8.2,I3,4F8.2)') &
                    var(5,i)//var(6,i)//var(7,i),stationID(1,i)//stationID(2,i)//stationID(3,i)//stationID(4,i)//stationID(5,i)//stationID(6,i)//stationID(7,i)//stationID(8,i),itype(i),rdhr(i),rlat(i),rlon(i),rprs(i),iuse_int(i),robs1(i),ddiff(i),robs2(i),rdpt2(i) 
@@ -93,6 +93,6 @@ program read_diag
 
    enddo
 
-   print *, diagfile(39:40)
+   print *, diagfile(90:91)
 
 end program read_diag
