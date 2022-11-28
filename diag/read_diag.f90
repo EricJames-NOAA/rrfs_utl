@@ -29,7 +29,13 @@ program read_diag
    integer, allocatable :: iuse_int(:)
 
    CALL GETARG(1, diagfile)
-   outfile = '/scratch1/BMC/wrfruc/ejames/diag_test.txt'
+   if (diagfile(90:91) .eq. 't_' .or. diagfile(90:91) .eq. 'q_') then
+      outfile = '/lfs4/BMC/nrtrr/NCO_dirs/stmp/tmpnwprd/RRFS_conus_3km/2022112815/anal_conv_gsi/diag_results.conv_' // diagfile(92:94)
+   else if (diagfile(90:91) .eq. 'ps' .or. diagfile(90:91) .eq. 'pw' .or. diagfile(90:91) .eq. 'rw' .or. diagfile(90:91) .eq. 'uv') then
+      outfile = '/lfs4/BMC/nrtrr/NCO_dirs/stmp/tmpnwprd/RRFS_conus_3km/2022112815/anal_conv_gsi/diag_results.conv_' // diagfile(93:95)
+   else
+      outfile = '/lfs4/BMC/nrtrr/NCO_dirs/stmp/tmpnwprd/RRFS_conus_3km/2022112815/anal_conv_gsi/diag_results.conv_' // diagfile(94:96)
+   endif
 
    call diag%open(trim(diagfile),'r',200)
    call diag%get_dim("nobs",nobs)
