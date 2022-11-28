@@ -9,6 +9,8 @@ program read_diag
 
    type(ncio) :: diag
 
+   logical :: exists
+
    character*180 :: diagfile
    character*180 :: outfile
 
@@ -73,7 +75,12 @@ program read_diag
       call diag%get_var_nc_real_1d("Obs_Minus_Forecast_adjusted",nobs,ddiff)
    endif
 
-   open(42, file=trim(outfile))
+   inquire(file=trim(outfile), exist=exists)
+   if (exists) then
+      open(42, file=trim(outfile), status='old', position='append', action='write')
+   else
+      open(42, file=trim(outfile), status='new', action='write')
+   endif
 
    do i=1,nobs
 
